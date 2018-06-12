@@ -4,7 +4,6 @@ import java.util.Map;
 
 public class Machine {
 
-	private String initialState;
 	private ArrayList<String> parsedData = new ArrayList<String>();
 	
 	//Fields below that hold info from parsed file.
@@ -17,16 +16,13 @@ public class Machine {
 	 * @param parsedData
 	 * @param initialState
 	 */
-	public Machine(ArrayList<String> parsedData, String initialState){
+	public Machine(ArrayList<String> parsedData){
 		this.parsedData = parsedData;
-		this.initialState = initialState;
 		listOfStates();
-		placeInitialState();
 		createTransitionTable();
 		
 		System.out.println("Automata has been created");
 		System.out.println("The following states exist " + states);
-		System.out.println(placeInitialState() + " is the starting state.");
 		System.out.println("The following transitions can occur for each state " + transitions);
 	}
 	
@@ -54,9 +50,7 @@ public class Machine {
 	 * Method returns initial state which is listed after .marking
 	 * @return
 	 */
-	private String placeInitialState() {
-		return initialState.substring(initialState.length()-2, initialState.length());
-	}
+
 	
 	/**
 	 * Transitions show communication between states to be pulled from parsed data. 

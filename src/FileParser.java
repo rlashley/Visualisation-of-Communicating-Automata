@@ -4,6 +4,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
 
 public class FileParser{	
 	
@@ -11,9 +14,10 @@ public class FileParser{
 	private String outputs = ".outputs";
 	private String end = ".end";
 	private String init = ".marking";
+	private String stateGraph = ".state graph";
 	private String initialState;
 	
-	private ArrayList<String> parsedData = new ArrayList<String>();
+	Map<String, ArrayList<String>> parsedData = new HashMap<String, ArrayList<String>>();
 	private ArrayList<String> dataFromFile = new ArrayList<String>();
 	
     /**
@@ -54,23 +58,51 @@ public class FileParser{
 
 			//Checks if the word .outputs is next in the list, assigns state to its own arraylist
 			if(outputs.equals(dataFromFile.get(i))) {
-			
+				
 				//Continue looping from that point until .end, assigning anything that starts with q to its own string
 				while(!end.equals(dataFromFile.get(i))) {
+					
 					String str = dataFromFile.get(i);
 					//If line is .marking, save the initial state
 					if(str.substring(0,8).equals(init)) {
-						initialState = str;
-					}
-					else{
-						parsedData.add(str.replaceAll("\\s", ""));
+						initialState = str.substring(9, str.length());
+						parsedData.put(initialState, new ArrayList<String>());
+					
 					}
 					i++;
-				}						
+				}													
 			}
 		}
-		System.out.println(parsedData);
-		Machine machine = new Machine(parsedData, initialState);
+		for (int i = 0; i < dataFromFile.size(); i++) {		
+
+			//Checks if the word .outputs is next in the list, assigns state to its own arraylist
+			if(outputs.equals(dataFromFile.get(i))) {
+				String mapLocation = dataFromFile.get(i+2);
+				String apart[] = mapLocation.split(" ", 5);
+				mapLocation = apart[0];
+				//Continue looping from that point until .end, assigning all strings to the properly mapped arrays
+				while(!end.equals(dataFromFile.get(i))) {
+					String str = dataFromFile.get(i);
+					if(str.equals(outputs) || str.substring(0,8).equals(init) || str.equals(stateGraph)) {
+					}
+					else {
+						parsedData.get(mapLocation).add(str);
+					}
+					i++;
+				}
+				i++;
+			}
+		}
+		printStatesToLoad();
+        System.out.println("Would you now like to create machines for the data that has been pulled from the file?");
+        Scanner scanner = new Scanner(System.in);
+        String nextLine = scanner.nextLine();
+        scanner.close();
+        if(nextLine.toLowerCase().equals("yes") || nextLine.toLowerCase().equals("y")) {
+
+    		//Machine machine = new Machine(name of key, array of data for key);
+        }
+
 	}
 	
 	/**
@@ -92,7 +124,7 @@ public class FileParser{
 	 * Returns parsedData array
 	 * @return
 	 */
-	public ArrayList<String> getStatesToLoad() {
+	public Map<String, ArrayList<String>> getStatesAndTransitions() {
 		return parsedData;
 	}
 	
