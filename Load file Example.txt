@@ -10,8 +10,6 @@ alice4 3 ! free alice0
 .marking alice0
 .end
 
-
-
 .outputs
 .state graph
 bob0 0 ? bwin bob1
@@ -20,8 +18,6 @@ bob0 2 ? blose bob2
 bob2 0 ! sig bob0
 .marking bob0
 .end
-
-
 
 .outputs
 .state graph
@@ -38,14 +34,9 @@ carol5 0 ! msg carol0
 .marking carol0
 .end
 
-
-
 .outputs
 .state graph
 dave0 2 ? busy dave1
 dave1 0 ? free dave0
 .marking dave0
 .end
-
-
-
