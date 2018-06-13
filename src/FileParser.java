@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 
 public class FileParser{	
 	
@@ -19,6 +20,8 @@ public class FileParser{
 	
 	Map<String, ArrayList<String>> parsedData = new HashMap<String, ArrayList<String>>();
 	private ArrayList<String> dataFromFile = new ArrayList<String>();
+	ArrayList<Machine> machines = new ArrayList<Machine>();
+	ArrayList<String> initialStates = new ArrayList<String>();
 	
     /**
      * Converts File to an Array List before parsing
@@ -67,7 +70,7 @@ public class FileParser{
 					if(str.substring(0,8).equals(init)) {
 						initialState = str.substring(9, str.length());
 						parsedData.put(initialState, new ArrayList<String>());
-					
+						initialStates.add(initialState);
 					}
 					i++;
 				}													
@@ -93,30 +96,35 @@ public class FileParser{
 				i++;
 			}
 		}
-		printStatesToLoad();
+		printLoadedStates();
+		//Prompt if user would like to create machines
         System.out.println("Would you now like to create machines for the data that has been pulled from the file?");
         Scanner scanner = new Scanner(System.in);
         String nextLine = scanner.nextLine();
         scanner.close();
         if(nextLine.toLowerCase().equals("yes") || nextLine.toLowerCase().equals("y")) {
-
-    		//Machine machine = new Machine(name of key, array of data for key);
+        	//Iterate through each entry in the Map, creating a machine and adding it to an Array list called machines
+        	for(String key : parsedData.keySet()){
+        		initialState = parsedData.get(key).get(0);
+        		String apart[] = initialState.split(" ");
+        		initialState = apart[0];
+        		machines.add(new Machine(parsedData.get(key), initialState));
+        	}
         }
-
 	}
 	
 	/**
-	 * Returns initial state
+	 * Returns array of initial states
 	 * @return
 	 */
-	public String getInitialState() {
-		return initialState;
+	public ArrayList<String> getInitialStates() {
+		return initialStates;
 	}
 	
 	/**
 	 * Prints out value of parsedData array
 	 */
-	public void printStatesToLoad() {
+	public void printLoadedStates() {
 		System.out.println(parsedData);
 	}
 	
