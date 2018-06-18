@@ -34,7 +34,7 @@ public class Machine {
 		String exit = "no";
 		String nextLine = null;
 
-		while(!(exit.toLowerCase().equals("yes")) || !(exit.toLowerCase().equals("y"))) {
+		while(!(exit.toLowerCase().equals("yes"))) {
 	        System.out.println("What transition would you like to make? ");
 	        Scanner scan = new Scanner(System.in);
 	        nextLine = scan.nextLine();	 
@@ -57,12 +57,13 @@ public class Machine {
 		        if(test.equals(currentState) && array[2].equals("!")) {
 	        		currentState = array[4];
 	        		System.out.println("Transition from queue successful");
+	        		queue.remove();
 		        }
 	        }
 	        
-	        System.out.println("The current state is " + currentState);
+	        System.out.println("The current state is " + currentState + " and there are " + queue.size() + " transitions waiting in the queue.");
 	        
-	        System.out.println("Would you like to change to another machine? Yes to change or No to continue");
+	        System.out.println("Would you like to change to another machine? Yes to change.");
 	        if(scan.hasNextLine()) {
 	        	nextLine = scan.next();
 	        }

@@ -45,7 +45,6 @@ public class FxApp extends Application {
                     	fileParser.convertFile(file);
                     }
                 }
-            });  
-
+            });
     }
 }
