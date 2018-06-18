@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.Set;
 
 public class FileParser{	
 	
@@ -17,11 +16,13 @@ public class FileParser{
 	private String init = ".marking";
 	private String stateGraph = ".state graph";
 	private String initialState;
+
 	
 	Map<String, ArrayList<String>> parsedData = new HashMap<String, ArrayList<String>>();
 	private ArrayList<String> dataFromFile = new ArrayList<String>();
 	ArrayList<Machine> machines = new ArrayList<Machine>();
 	ArrayList<String> initialStates = new ArrayList<String>();
+	ArrayList<String> placeHolder = new ArrayList<String>();
 	
     /**
      * Converts File to an Array List before parsing
@@ -62,7 +63,7 @@ public class FileParser{
 			//Checks if the word .outputs is next in the list, assigns state to its own arraylist
 			if(outputs.equals(dataFromFile.get(i))) {
 				
-				//Continue looping from that point until .end, assigning anything that starts with q to its own string
+				//Continue looping from that point until .end
 				while(!end.equals(dataFromFile.get(i))) {
 					
 					String str = dataFromFile.get(i);
@@ -81,7 +82,7 @@ public class FileParser{
 			//Checks if the word .outputs is next in the list, assigns state to its own arraylist
 			if(outputs.equals(dataFromFile.get(i))) {
 				String mapLocation = dataFromFile.get(i+2);
-				String apart[] = mapLocation.split(" ", 5);
+				String apart[] = mapLocation.split(" ");
 				mapLocation = apart[0];
 				//Continue looping from that point until .end, assigning all strings to the properly mapped arrays
 				while(!end.equals(dataFromFile.get(i))) {
@@ -101,16 +102,24 @@ public class FileParser{
         System.out.println("Would you now like to create machines for the data that has been pulled from the file?");
         Scanner scanner = new Scanner(System.in);
         String nextLine = scanner.nextLine();
-        scanner.close();
         if(nextLine.toLowerCase().equals("yes") || nextLine.toLowerCase().equals("y")) {
         	//Iterate through each entry in the Map, creating a machine and adding it to an Array list called machines
         	for(String key : parsedData.keySet()){
         		initialState = parsedData.get(key).get(0);
         		String apart[] = initialState.split(" ");
         		initialState = apart[0];
+        		placeHolder.add(initialState);
         		machines.add(new Machine(parsedData.get(key), initialState));
         	}
         }
+  
+        System.out.println("What machine would you like to change the state of?");
+        for(int k=0; k < placeHolder.size(); k++) {
+        	System.out.println(placeHolder.get(k));
+        }
+        nextLine = scanner.nextLine();
+        int nextInt = placeHolder.indexOf(nextLine);
+        machines.get(nextInt).successors();
 	}
 	
 	/**
@@ -135,5 +144,9 @@ public class FileParser{
 	public Map<String, ArrayList<String>> getStatesAndTransitions() {
 		return parsedData;
 	}
+	
+	public ArrayList<Machine> getMachines(){
+		return machines;
+	}	
 	
 }
