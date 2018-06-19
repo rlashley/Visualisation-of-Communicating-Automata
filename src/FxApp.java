@@ -1,5 +1,4 @@
 import java.io.File;
-import java.util.ArrayList;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -17,7 +16,6 @@ public class FxApp extends Application {
 	
 	//Creates FileParser object with methods that alter the incoming Array of Strings into the format we need
 	FileParser fileParser = new FileParser();
-
 	
     @Override
     public void start(Stage primaryStage) throws Exception {
