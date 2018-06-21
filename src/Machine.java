@@ -15,10 +15,13 @@ public class Machine {
 		this.transitions = parsedData;
 		this.initialState = initialState;
 		System.out.println("Machine has been created");
-		System.out.println("Current State is " + this.initialState);
 		
 		//List of transitions for the machine.
 		System.out.println("This machine can make the following transitions: " + transitions);
+	}
+	
+	public ArrayList<String> getTransitions(){
+		return transitions;
 	}
 	      	
 }

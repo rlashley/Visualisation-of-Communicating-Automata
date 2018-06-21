@@ -77,8 +77,8 @@ public class FileParser{
 						String[] halfQueue = str.split(" ");
 						String name = mapLocation+halfQueue[1];
 						String backName = halfQueue[1]+mapLocation;
-						queues.put(name, null);
-						queues.put(backName, null);
+						queues.put(name, new ArrayDeque<String>());
+						queues.put(backName, new ArrayDeque<String>());
 						}
 					}
 					i++;
@@ -118,6 +118,9 @@ public class FileParser{
 		configure.setStates(initialStates);
 		//Set queue for configure from parsedData
 		configure.setQueue(queues);
+		//Send built machines to configure for processing
+		configure.setMachines(machines);
+		configure.successors();
 	}
 	
 }
