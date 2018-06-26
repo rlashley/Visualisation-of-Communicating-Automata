@@ -1,4 +1,5 @@
 import java.io.File;
+import java.io.IOException;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -40,7 +41,11 @@ public class FxApp extends Application {
                     File file = fileChooser.showOpenDialog(primaryStage);
                     if (file != null) {
                     	//Execute the method to convert to string array before sending to file parser                        	
-                    	fileParser.convertFile(file);
+                    	try {
+							fileParser.convertFile(file);
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						}
                     }
                 }
             });

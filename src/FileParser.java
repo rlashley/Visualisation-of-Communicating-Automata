@@ -1,6 +1,5 @@
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayDeque;
@@ -29,28 +28,16 @@ public class FileParser{
     /**
      * Converts File to an Array List before parsing
      * @param file
+     * @throws IOException 
      */
-    public void convertFile(File file) {
+    public void convertFile(File file) throws IOException {
     	ArrayList<String> list = new ArrayList<String>();
     	BufferedReader reader = null;
-		try {
-			reader = new BufferedReader(new FileReader(file));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
+    	reader = new BufferedReader(new FileReader(file));
     	String line;
-    	try {
-			while ((line = reader.readLine()) != null) {
-			    list.add(line);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-    	try {
-			reader.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		while ((line = reader.readLine()) != null) 
+		list.add(line);
+		reader.close();
     	this.dataFromFile = list;
 		parseTheData();
     }
@@ -95,7 +82,6 @@ public class FileParser{
 	 * initial states and possible moves.
 	 */
 	private void machineCreation() {
-
 		
 		//Prompt if user would like to create machines
         System.out.println("Would you now like to create machines for the data that has been pulled from the file?");
