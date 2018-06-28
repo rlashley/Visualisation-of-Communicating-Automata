@@ -3,7 +3,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.Set;
+
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
 
 public class Configure {
 
@@ -55,7 +61,7 @@ public class Configure {
 	        System.out.println("Choose a state to load");
 	        //Print out the states possible for each machine
         	ArrayList<String> tempTrans = machines.get(nextInt).getTransitions();
-        	//This loops through the list of transitions of the machine and pulls possible things that can happen from it's current state
+        	//This loops through the list of transitions of the machine and pulls possible transitions from its current state
 	        for(int i = 0; i < tempTrans.size(); i++) {
 	        	String pull = tempTrans.get(i);
 	        	String[] apart = pull.split(" ");
@@ -72,11 +78,18 @@ public class Configure {
 	        }
 	        Scanner scan = new Scanner(System.in);
 	        nextLine = scan.nextLine();
+	        //Checks if what was entered by user matches one of the possible transitions
 	        if(listOfCurrentTransitions.contains(nextLine)) {
 	        	//Load choice into proper queue
 	        	String[] apart = nextLine.split(" ");
 	        	String queueName = Integer.toString(nextInt)+apart[1];
-	        	queue.get(queueName).add(nextLine);
+	        	//This creates a bound on the amount of transitions that can be in the queue
+	        	if(queue.get(queueName).size()<5) {
+	        		queue.get(queueName).add(nextLine);
+	        	}
+	        	else {
+	        		System.out.println("There are too many items in the queue. Most recent choice will not enter queue.");
+	        	}
 		        nextInt++;
 	        }
 	        else {
@@ -132,5 +145,23 @@ public class Configure {
 	        }
 	        listOfCurrentTransitions.clear();
 		}
-	}  
+	}		
+}
+
+class SecondScene {
+	
+	public SecondScene() 
+	{
+		Stage subStage = new Stage();
+		subStage.setTitle("");
+		Label runningText = new Label();
+		Button runButton = new Button("Click to run");
+		runButton.setPrefSize(200, 80);
+		HBox hbox = new HBox(runningText, runButton);
+		hbox.setSpacing(10);
+		hbox.setPadding(new Insets(15));
+		Scene scene2 = new Scene(hbox, 400, 400);
+		subStage.setScene(scene2);
+		subStage.show();
+	}	
 }

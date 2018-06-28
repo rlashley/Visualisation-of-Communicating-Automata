@@ -16,7 +16,7 @@ import javafx.stage.FileChooser.ExtensionFilter;
 public class FxApp extends Application {
 	
 	//Creates FileParser object with methods that alter the incoming Array of Strings into the format we need
-	FileParser fileParser = new FileParser();
+	FileParser fileParser = new FileParser();	
 	
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -37,17 +37,19 @@ public class FxApp extends Application {
         openButton.setOnAction(
             new EventHandler<ActionEvent>() {
                 @Override
-                public void handle(final ActionEvent e) {
+                public void handle(ActionEvent e) {
                     File file = fileChooser.showOpenDialog(primaryStage);
                     if (file != null) {
                     	//Execute the method to convert to string array before sending to file parser                        	
                     	try {
 							fileParser.convertFile(file);
+	                    	fileParser.machineCreation();
 						} catch (IOException e1) {
 							e1.printStackTrace();
 						}
                     }
                 }
-            });
+            });       
     }
+
 }

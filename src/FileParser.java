@@ -6,7 +6,6 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
 
 public class FileParser{	
 	
@@ -32,14 +31,14 @@ public class FileParser{
      */
     public void convertFile(File file) throws IOException {
     	ArrayList<String> list = new ArrayList<String>();
-    	BufferedReader reader = null;
-    	reader = new BufferedReader(new FileReader(file));
+    	BufferedReader reader = new BufferedReader(new FileReader(file));
     	String line;
-		while ((line = reader.readLine()) != null) 
-		list.add(line);
+		while ((line = reader.readLine()) != null) {
+			list.add(line);
+		}
 		reader.close();
     	this.dataFromFile = list;
-		parseTheData();
+		parseTheData();	
     }
 	
     /**
@@ -56,6 +55,7 @@ public class FileParser{
 				//Continue looping from that point until .end, assigning all strings to the properly mapped arrays
 				while(!end.equals(dataFromFile.get(i))) {
 					String str = dataFromFile.get(i);
+					str = str.trim();
 					if(str.equals(outputs) || str.equals(stateGraph)) {
 					}
 					else {
@@ -74,39 +74,31 @@ public class FileParser{
 				machineNumber++;
 			}
 		}
-		machineCreation();	
 	}
 	
 	/**
 	 * Creates static machines using data that has been parsed. Static machines should only hold their
 	 * initial states and possible moves.
 	 */
-	private void machineCreation() {
-		
-		//Prompt if user would like to create machines
-        System.out.println("Would you now like to create machines for the data that has been pulled from the file?");
-        Scanner scanner = new Scanner(System.in);
-        String nextLine = scanner.nextLine();
-        if(nextLine.toLowerCase().equals("yes") || nextLine.toLowerCase().equals("y")) {
-        	//Iterate through each entry in the Map, creating a machine and adding it to an Array list called machines
-        	for(Integer key : parsedData.keySet()){
-        		int k = parsedData.get(key).size();
-        		initialState = parsedData.get(key).get(k-1);
-        		String[] chop = initialState.split(" ");
-        		initialState = chop[1];
-        		initialStates.put(Integer.toString(key), initialState);
-        		parsedData.get(key).remove(k-1);
-        		
-        		machines.add(new Machine(parsedData.get(key), initialState));
-        	}
+	public void machineCreation() {
+        //Iterate through each entry in the Map, creating a machine and adding it to an Array list called machines
+        for(Integer key : parsedData.keySet()){
+        	int k = parsedData.get(key).size();
+        	initialState = parsedData.get(key).get(k-1);
+        	String[] chop = initialState.split(" ");
+        	initialState = chop[1];
+        	initialStates.put(Integer.toString(key), initialState);
+        	parsedData.get(key).remove(k-1);
+        	
+        	machines.add(new Machine(parsedData.get(key), initialState));
         }
-		//Set configure states from initialStates
-		configure.setStates(initialStates);
-		//Set queue for configure from parsedData
-		configure.setQueue(queues);
-		//Send built machines to configure for processing
-		configure.setMachines(machines);
-		configure.successors();
-	}
-	
+        
+	//Set configure states from initialStates
+	configure.setStates(initialStates);
+	//Set queue for configure from parsedData
+	configure.setQueue(queues);
+	//Send built machines to configure for processing
+	configure.setMachines(machines);
+	configure.successors();
+	}	
 }
