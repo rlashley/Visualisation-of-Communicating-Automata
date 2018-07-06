@@ -14,15 +14,11 @@ public class FileParser{
 	private String end = ".end";
 	private String init = ".marking";
 	private String stateGraph = ".state graph";
-	private String initialState;
-	int machineNumber = 0;
+	private int machineNumber = 0;
 
-	Map<Integer, ArrayList<String>> parsedData = new HashMap<Integer, ArrayList<String>>();
+	private Map<Integer, ArrayList<String>> parsedData = new HashMap<Integer, ArrayList<String>>();
 	private ArrayList<String> dataFromFile = new ArrayList<String>();
-	ArrayList<Machine> machines = new ArrayList<Machine>();
-	Map<String, String> initialStates = new HashMap<String, String>();
-	Map<String, ArrayDeque<String>> queues = new HashMap<String, ArrayDeque<String>>();
-	Configure configure = new Configure();
+	private Map<String, ArrayDeque<String>> queues = new HashMap<String, ArrayDeque<String>>();
 	
     /**
      * Converts File to an Array List before parsing
@@ -38,7 +34,8 @@ public class FileParser{
 		}
 		reader.close();
     	this.dataFromFile = list;
-		parseTheData();	
+		parseTheData();
+
     }
 	
     /**
@@ -76,29 +73,12 @@ public class FileParser{
 		}
 	}
 	
-	/**
-	 * Creates static machines using data that has been parsed. Static machines should only hold their
-	 * initial states and possible moves.
-	 */
-	public void machineCreation() {
-        //Iterate through each entry in the Map, creating a machine and adding it to an Array list called machines
-        for(Integer key : parsedData.keySet()){
-        	int k = parsedData.get(key).size();
-        	initialState = parsedData.get(key).get(k-1);
-        	String[] chop = initialState.split(" ");
-        	initialState = chop[1];
-        	initialStates.put(Integer.toString(key), initialState);
-        	parsedData.get(key).remove(k-1);
-        	
-        	machines.add(new Machine(parsedData.get(key), initialState));
-        }
-        
-	//Set configure states from initialStates
-	configure.setStates(initialStates);
-	//Set queue for configure from parsedData
-	configure.setQueue(queues);
-	//Send built machines to configure for processing
-	configure.setMachines(machines);
-	configure.successors();
-	}	
+	public Map<String, ArrayDeque<String>> getQueues() {
+		return queues;
+	}
+	
+	public Map<Integer, ArrayList<String>> getParsedData() {
+		return parsedData;
+	}
+	
 }

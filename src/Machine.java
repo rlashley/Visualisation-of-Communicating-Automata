@@ -15,10 +15,8 @@ public class Machine {
 	public Machine(ArrayList<String> parsedData, String initialState){
 		this.transitions = parsedData;
 		this.initialState = initialState;
-		System.out.println("Machine has been created");
 		
 		//List of transitions for the machine.
-		System.out.println("This machine can make the following transitions: " + transitions);
 	}
 	
 	public ArrayList<String> getTransitions(){
