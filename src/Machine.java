@@ -1,9 +1,10 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Machine {
 
 	//Fields below that hold info from parsed file.
-	private ArrayList<String> transitions = new ArrayList<String>();
+	private HashMap<String, ArrayList<String>> mappedTransitions = new HashMap<String, ArrayList<String>>();
 	private String initialState;
 	private ArrayList<String> messages = new ArrayList<String>();
 	
@@ -13,14 +14,28 @@ public class Machine {
 	 * @param initialState
 	 */
 	public Machine(ArrayList<String> parsedData, String initialState){
-		this.transitions = parsedData;
 		this.initialState = initialState;
-		
-		//List of transitions for the machine.
+		convertTransitionsToMap(parsedData);
+	}
+
+	/**
+	 * This method will convert machine transitions into a map, with the key being the state.
+	 */
+	public void convertTransitionsToMap(ArrayList<String> transitions) {
+		for(int i = 0; i < transitions.size(); i++) {
+			String[] stateName = transitions.get(i).split(" ");
+			if(!mappedTransitions.containsKey(stateName[0])) {
+				mappedTransitions.put(stateName[0], new ArrayList<String>());
+			}
+			String transition = transitions.get(i).replace(stateName[0], "");
+			transition = transition.trim();
+			mappedTransitions.get(stateName[0]).add(transition);
+		}
 	}
 	
-	public ArrayList<String> getTransitions(){
-		return transitions;
+	public ArrayList<String> successors(String currentState){
+		//Check current state and return transitions based on that		
+		return mappedTransitions.get(currentState);
 	}
 	
 	public void saveMessages(String message) {
