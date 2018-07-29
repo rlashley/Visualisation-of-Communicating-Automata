@@ -30,6 +30,8 @@ public class FxApp extends Application {
 	String[] swap = null;
 	String[] apart = null, apart2 = null;
 	String compare, compare2;
+	String queueName, key2;
+	boolean transferCheck;
 	
 	private Random rand = new Random();
 	private ArrayList<String> listOfCurrentTransitions = new ArrayList<String>();
@@ -103,74 +105,47 @@ public class FxApp extends Application {
         	        	textArea.appendText("\nNo transitions for machine " + k + " exist from its current state \n");
         	        }
         	        //Checks the first character of the transition and loads choice into proper queue
-        	        String[] apart = randTransition.split(" ");
-        	        String queueName = Integer.toString(nextInt)+apart[0];
-        	        //This creates a bound on the amount of transitions that can be in the queue
-        	        if(queues.get(queueName).size()<6) {
-        	        	queues.get(queueName).add(randTransition);
-        	        }
-        	        else {
+        	        addTransitionsToQueue();
+        	        if(queues.get(queueName).size()>=5) {
         	        	textArea.appendText("There are too many items in the queue. Most recent choice will not enter queue. \n");
         	        }
-        		    nextInt++;
-        	        
+        		    nextInt++;     	        
             	    listOfCurrentTransitions.clear();
         	    }      	    
-        	        //Counts up to a single queue selection for each machine before automatically firing transitions.
+        	    	//Counts up to a single queue selection for each machine before automatically firing transitions.
         	        if(nextInt == machines.size()) {
-        	        	
         	        	//Compare matching queues to see if transitions can go through.
         	        	for(String key : queues.keySet()) {
-        	        		swap = key.split("");
-        	        		String key2 = swap[1]+swap[0];
-        	        		if((!queues.get(key).isEmpty()) && (!queues.get(key2).isEmpty())) {
-        	        			compare = queues.get(key).getFirst();
-        		        		apart = compare.split(" ");
-        		        		compare2 = queues.get(key2).getFirst();
-        		        		apart2 = compare2.split(" ");
-        	        		
-        		        		if(apart[1].equals(swap[1]) && apart2[1].equals(swap[0])) {
-        		        			if( (apart[2].equals("!") && apart2[2].equals("?")) ) {
-        		        				if(apart[3].equals(apart2[3])) {
-        		        					//Assign message to proper machine
-        		        					machines.get(Integer.parseInt(swap[1])).saveMessages(apart[3]);
-        		        					textArea.appendText("\nMessage from machine " + swap[0] + " has been delivered to machine " + swap[1]);
-        		        			    	//Update states of machines
-        		        					states.put(swap[0], apart[4]);
-        		        					states.put(swap[1], apart2[4]);
-        		        					//Removes from the queue the successful transitions.
-        		        					queues.get(key).remove();
-        		        					queues.get(key2).remove();
-        		        				}		        				
-        		        				else {
-        		        					textArea.appendText("\nMessages in queue did not match");
-        		        				}	        				
-        		        			}	
-        		        			else {
-        		        				textArea.appendText("\nSend/Receive states did not match");
-        		        			}
-        		        		}
+        	        		transferBetweenQueues(key);
+        	        		if(transferCheck == true) {
+        		        		textArea.appendText("\nMessage from machine " + swap[0] + " has been delivered to machine " + swap[1]);
+        		        		updateMachines(key);
+        	        		}
+        	        		if(!(queues.get(key).isEmpty()) && !(queues.get(key2).isEmpty())) {
+        	        			if(!(apart[2].equals(apart2[2]))) 
+        	        				textArea.appendText("\nMessages in queue did not match");	        					
+        	        			if(!(apart[1].equals("!") && apart2[1].equals("?"))) 
+        	        				textArea.appendText("\nSend/Receive states did not match");
         	        		}
         	        	}
+        	        }
         	        	//Checks all queues and warns if transitions haven't occurred.
         		        for(String key : queues.keySet()) {
         		        	if(!queues.get(key).isEmpty()) {
         		        		textArea.appendText("\nQueue for machine " + key.charAt(0) + " is not empty. The following transitions can't occur. \n" + queues.get(key).toString());
         		            }
         		        }
-        		        nextInt = 0;  
-        	        }
+        		        nextInt = 0;
         		}     		
         });
         
         queueButton.setOnAction(new EventHandler <ActionEvent>() 
         {
         	public void handle(ActionEvent event) {
-        		states = initialStates;
         		textArea.clear();
         		for(String key : queues.keySet()) {
 		        	if(!queues.get(key).isEmpty()) {
-		        		queues.get(key).poll();
+		        		queues.get(key).clear();
 		            }
 		        }
             }
@@ -180,6 +155,47 @@ public class FxApp extends Application {
     private void randomGenerator() {
     	int ranNumber = rand.nextInt(listOfCurrentTransitions.size());
     	randTransition = listOfCurrentTransitions.get(ranNumber);
+    }
+    
+    private void addTransitionsToQueue() {
+        String[] apart = randTransition.split(" ");
+        queueName = Integer.toString(nextInt)+apart[0];
+        //This creates a bound on the amount of transitions that can be in the queue
+        if(queues.get(queueName).size()<5) {
+        	queues.get(queueName).add(randTransition);
+        }
+    }
+    
+    private void transferBetweenQueues(String key) {
+    	transferCheck = false;
+		swap = key.split("");
+		key2 = swap[1]+swap[0];
+		if((!queues.get(key).isEmpty()) && (!queues.get(key2).isEmpty())) {
+			compare = queues.get(key).getFirst();
+    		apart = compare.split(" ");
+    		compare2 = queues.get(key2).getFirst();
+    		apart2 = compare2.split(" ");
+		
+    		if(apart[0].equals(swap[1]) && apart2[0].equals(swap[0])) {
+    			if(apart[1].equals("!") && apart2[1].equals("?")) {
+    				if(apart[2].equals(apart2[2])) {
+    					//Assign message to proper machine
+    					machines.get(Integer.parseInt(swap[1])).saveMessages(apart[2]);
+    					transferCheck = true;
+    					
+    				}
+    			}
+    		}
+		}
+    }
+    
+    private void updateMachines(String key) {
+		//Update states of machines
+		states.put(swap[0], apart[3]);
+		states.put(swap[1], apart2[3]);
+		//Removes from the queue the successful transitions.
+		queues.get(key).remove();
+		queues.get(key2).remove();
     }
 
 	/**
@@ -198,7 +214,7 @@ public class FxApp extends Application {
         	initialStates.put(Integer.toString(key), initialState);
         	parsedData.get(key).remove(k-1);      
         	
-        	machines.add(new Machine(parsedData.get(key), initialState));
+        	machines.add(new Machine(parsedData.get(key)));
         }
 	}
 }
