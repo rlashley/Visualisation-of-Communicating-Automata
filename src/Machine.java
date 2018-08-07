@@ -4,6 +4,7 @@ import java.util.HashMap;
 public class Machine {
 
 	//Fields below that hold info from parsed file.
+	private String initialState;
 	private HashMap<String, ArrayList<String>> mappedTransitions = new HashMap<String, ArrayList<String>>();
 	private ArrayList<String> messages = new ArrayList<String>();
 	
@@ -12,7 +13,8 @@ public class Machine {
 	 * @param parsedData
 	 * @param initialState
 	 */
-	public Machine(ArrayList<String> parsedData){
+	public Machine(ArrayList<String> parsedData, String initialState){
+		this.initialState = initialState;
 		convertTransitionsToMap(parsedData);
 	}
 
@@ -39,5 +41,8 @@ public class Machine {
 	public void saveMessages(String message) {
 		this.messages.add(message);
 	}
-	      	
+	
+	public String getInitialState() {
+		return initialState;
+	}      	
 }

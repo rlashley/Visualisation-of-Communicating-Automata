@@ -25,13 +25,12 @@ public class FxApp extends Application {
 	FileParser fileParser = new FileParser();
 
     private String randTransition = null;
-	private String initialState;
 	private int nextInt = 0;
-	String[] swap = null;
-	String[] apart = null, apart2 = null;
-	String compare, compare2;
-	String queueName, key2;
-	boolean transferCheck;
+	private String[] swap = null;
+	private String[] apart = null, apart2 = null;
+	private String compare, compare2;
+	private String queueName, key2;
+	private boolean transferCheck;
 	
 	private Random rand = new Random();
 	private ArrayList<String> listOfCurrentTransitions = new ArrayList<String>();
@@ -51,7 +50,7 @@ public class FxApp extends Application {
         Button startButton = new Button("Start");
         Button openButton = new Button("Click to open a file...");
         openButton.setPrefSize(200, 80);
-        Button queueButton = new Button("Clear Queues");
+        Button queueButton = new Button("Restart");
         
         TextArea textArea = new TextArea();
         textArea.setMinSize(400, 300);
@@ -96,7 +95,7 @@ public class FxApp extends Application {
                 	listOfCurrentTransitions = machines.get(nextInt).successors(states.get(Integer.toString(k)));
                 	//This loops through the list of transitions of the machine and pulls possible transitions from its current state
         	        if(!(listOfCurrentTransitions.isEmpty())) {
-        	        	textArea.appendText("The following transitions are possible. \n" + listOfCurrentTransitions);
+        	        	textArea.appendText("The following transitions are possible for machine " + k + ". \n" + listOfCurrentTransitions);
 						//Create random number and pull transition in that position of list
         	        	randomGenerator();
         	        	textArea.appendText("\n" + randTransition + " has been added to the queue.\n");
@@ -110,7 +109,7 @@ public class FxApp extends Application {
         	        	textArea.appendText("There are too many items in the queue. Most recent choice will not enter queue. \n");
         	        }
         		    nextInt++;     	        
-            	    listOfCurrentTransitions.clear();
+            	    listOfCurrentTransitions = null;        	    
         	    }      	    
         	    	//Counts up to a single queue selection for each machine before automatically firing transitions.
         	        if(nextInt == machines.size()) {
@@ -147,6 +146,9 @@ public class FxApp extends Application {
 		        	if(!queues.get(key).isEmpty()) {
 		        		queues.get(key).clear();
 		            }
+        		}
+		        for(int i = 0; i < machines.size(); i++) {
+		        	initialStates.put((Integer.toString(i)),machines.get(i).getInitialState());
 		        }
             }
         });
@@ -208,13 +210,13 @@ public class FxApp extends Application {
         //Iterate through each entry in the Map, creating a machine and adding it to an Array list called machines
         for(Integer key : parsedData.keySet()){
         	int k = parsedData.get(key).size();
-        	initialState = parsedData.get(key).get(k-1);
+        	String initialState = parsedData.get(key).get(k-1);
         	String[] chop = initialState.split(" ");
         	initialState = chop[1];
         	initialStates.put(Integer.toString(key), initialState);
         	parsedData.get(key).remove(k-1);      
         	
-        	machines.add(new Machine(parsedData.get(key)));
+        	machines.add(new Machine(parsedData.get(key), initialState));
         }
 	}
 }
