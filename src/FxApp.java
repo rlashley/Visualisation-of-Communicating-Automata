@@ -33,7 +33,8 @@ public class FxApp extends Application {
 	private boolean transferCheck;
 	
 	private Random rand = new Random();
-	private ArrayList<String> listOfCurrentTransitions = new ArrayList<String>();
+	private ArrayList<String> listOfTransitions = new ArrayList<String>();
+	private ArrayList<String> listOfUpdatedTransitions = new ArrayList<String>();
 	private ArrayList<Machine> machines = new ArrayList<Machine>();
 	private Map<String, String> initialStates = new HashMap<String, String>();
 	private Map<String, String> states = new HashMap<String, String>();
@@ -47,7 +48,7 @@ public class FxApp extends Application {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Text Files", "*.txt"));
         
-        Button startButton = new Button("Start");
+        Button startButton = new Button("Run");
         Button openButton = new Button("Click to open a file...");
         openButton.setPrefSize(200, 80);
         Button queueButton = new Button("Restart");
@@ -92,48 +93,51 @@ public class FxApp extends Application {
         		states = initialStates;       		
 
         	    for(int k = 0; k < machines.size(); k++) {
-                	listOfCurrentTransitions = machines.get(nextInt).successors(states.get(Integer.toString(k)));
+                	listOfTransitions = machines.get(nextInt).successors(states.get(Integer.toString(k)));
                 	//This loops through the list of transitions of the machine and pulls possible transitions from its current state
-        	        if(!(listOfCurrentTransitions.isEmpty())) {
-        	        	textArea.appendText("The following transitions are possible for machine " + k + ". \n" + listOfCurrentTransitions);
-						//Create random number and pull transition in that position of list
-        	        	randomGenerator();
+        	        if(!(listOfTransitions == null)) {
+        	        	textArea.appendText("\nThe following transitions are possible for machine " + k + ". \n" + listOfTransitions);
+        	        	listOfUpdatedTransitions = (ArrayList<String>) listOfTransitions.clone();        	        	
+        	        	//Checks previously queued transitions and removes incompatible transitions from list of next transitions
+        	        	increaseChanceOfTransition(k);
+        	        	randomGenerator();       	        	        	        	
         	        	textArea.appendText("\n" + randTransition + " has been added to the queue.\n");
-        	        }     	
-        	        else {
-        	        	textArea.appendText("\nNo transitions for machine " + k + " exist from its current state \n");
+        	        	addTransitionsToQueue();
         	        }
-        	        //Checks the first character of the transition and loads choice into proper queue
-        	        addTransitionsToQueue();
+        	        else {
+        	        	textArea.appendText("\nNo new transitions for machine " + k + " are possible from its current state \n");
+        	        }
         	        if(queues.get(queueName).size()>=5) {
-        	        	textArea.appendText("There are too many items in the queue. Most recent choice will not enter queue. \n");
+        	        	textArea.appendText("\nThere are too many items in queue " + queueName + ". Most recent choice will not enter queue. \n");
         	        }
         		    nextInt++;     	        
-            	    listOfCurrentTransitions = null;        	    
+            	    listOfTransitions = null;  
+            	    listOfUpdatedTransitions = null;
         	    }      	    
         	    	//Counts up to a single queue selection for each machine before automatically firing transitions.
         	        if(nextInt == machines.size()) {
-        	        	//Compare matching queues to see if transitions can go through.
         	        	for(String key : queues.keySet()) {
         	        		transferBetweenQueues(key);
         	        		if(transferCheck == true) {
-        		        		textArea.appendText("\nMessage from machine " + swap[0] + " has been delivered to machine " + swap[1]);
+        		        		textArea.appendText("\n<--Message from machine " + swap[0] + " has been delivered to machine " + swap[1] + "-->");
         		        		updateMachines(key);
         	        		}
         	        		if(!(queues.get(key).isEmpty()) && !(queues.get(key2).isEmpty())) {
+        	        			if((apart[1].equals(apart2[1]))) 
+        	        				textArea.appendText("\nSend/Receive states did not match between machines " + swap[0] + " and " + swap[1]);
         	        			if(!(apart[2].equals(apart2[2]))) 
-        	        				textArea.appendText("\nMessages in queue did not match");	        					
-        	        			if(!(apart[1].equals("!") && apart2[1].equals("?"))) 
-        	        				textArea.appendText("\nSend/Receive states did not match");
+        	        				textArea.appendText("\nMessages in queue did not match between machines " + swap[0] + " and " + swap[1]);	        					
+        	        			
         	        		}
         	        	}
         	        }
         	        	//Checks all queues and warns if transitions haven't occurred.
         		        for(String key : queues.keySet()) {
         		        	if(!queues.get(key).isEmpty()) {
-        		        		textArea.appendText("\nQueue for machine " + key.charAt(0) + " is not empty. The following transitions can't occur. \n" + queues.get(key).toString());
+        		        		textArea.appendText("\nQueue " + key + " is not empty. The following transitions can't occur. \n" + queues.get(key).toString() + "\n");
         		            }
         		        }
+        		        textArea.appendText("--------------------------------------------------------------------------------\n");
         		        nextInt = 0;
         		}     		
         });
@@ -154,11 +158,17 @@ public class FxApp extends Application {
         });
     }
     
+	/*
+	 * Create random number and pull transition in that position of list
+	 */
     private void randomGenerator() {
-    	int ranNumber = rand.nextInt(listOfCurrentTransitions.size());
-    	randTransition = listOfCurrentTransitions.get(ranNumber);
+    	int ranNumber = rand.nextInt(listOfUpdatedTransitions.size());
+    	randTransition = listOfUpdatedTransitions.get(ranNumber);
     }
     
+    /*
+     * Checks the first character of the transition and loads choice into proper queue
+     */
     private void addTransitionsToQueue() {
         String[] apart = randTransition.split(" ");
         queueName = Integer.toString(nextInt)+apart[0];
@@ -168,6 +178,9 @@ public class FxApp extends Application {
         }
     }
     
+    /*
+     * Transfers the transitions between the queues
+     */
     private void transferBetweenQueues(String key) {
     	transferCheck = false;
 		swap = key.split("");
@@ -179,18 +192,45 @@ public class FxApp extends Application {
     		apart2 = compare2.split(" ");
 		
     		if(apart[0].equals(swap[1]) && apart2[0].equals(swap[0])) {
-    			if(apart[1].equals("!") && apart2[1].equals("?")) {
+    			if((apart[1].equals("!") && apart2[1].equals("?")) || (apart[1].equals("?") && apart2[1].equals("!"))) {
     				if(apart[2].equals(apart2[2])) {
     					//Assign message to proper machine
     					machines.get(Integer.parseInt(swap[1])).saveMessages(apart[2]);
-    					transferCheck = true;
-    					
+    					transferCheck = true;		
     				}
     			}
     		}
 		}
     }
     
+    /*
+     * This increases the chance of a matching transition occurring
+     */
+    private void increaseChanceOfTransition(int k) {
+    	for(int i = 0; i < listOfUpdatedTransitions.size(); i++) {
+    		String check = listOfUpdatedTransitions.get(i);
+    		char a = check.charAt(0);
+    		String queueCheck = a + Integer.toString(k);
+    		
+    		if(!queues.get(queueCheck).isEmpty()) {
+    			if(queues.get(queueCheck).getFirst().contains("!")) {
+    				//Remove transitions that contain a "!"
+    				for(String list : listOfUpdatedTransitions) {
+    					if(list.contains("!")) {
+    						listOfUpdatedTransitions.remove(list);
+    					}
+    				}
+    			}  	        			
+    		}
+    		if(listOfUpdatedTransitions.size() == 0) {
+    			listOfUpdatedTransitions = listOfTransitions;
+    		}
+    	}
+    }
+    
+    /*
+     * This updates the state of the machines and removes successful transitions from the queue.
+     */
     private void updateMachines(String key) {
 		//Update states of machines
 		states.put(swap[0], apart[3]);
