@@ -54,7 +54,7 @@ public class FxApp extends Application {
         Button queueButton = new Button("Restart");
         
         TextArea textArea = new TextArea();
-        textArea.setMinSize(400, 300);
+        textArea.setMinSize(400, 400);
         textArea.setWrapText(true);
         
         Label lbl = new Label();
@@ -63,7 +63,7 @@ public class FxApp extends Application {
         vbox.setPadding(new Insets(15));
         lbl.setText("This tool creates virtual automata\r based on a loading file.");
         
-        Scene scene = new Scene(vbox, 640, 520);
+        Scene scene = new Scene(vbox, 640, 620);
         primaryStage.setScene(scene);
         primaryStage.show();
         
@@ -101,7 +101,7 @@ public class FxApp extends Application {
         	        	//Checks previously queued transitions and removes incompatible transitions from list of next transitions
         	        	increaseChanceOfTransition(k);
         	        	randomGenerator();       	        	        	        	
-        	        	textArea.appendText("\n" + randTransition + " has been added to the queue.\n");
+        	        	textArea.appendText("\n" + randTransition + " has been selected for the queue.\n");
         	        	addTransitionsToQueue();
         	        }
         	        else {
@@ -127,7 +127,6 @@ public class FxApp extends Application {
         	        				textArea.appendText("\nSend/Receive states did not match between machines " + swap[0] + " and " + swap[1]);
         	        			if(!(apart[2].equals(apart2[2]))) 
         	        				textArea.appendText("\nMessages in queue did not match between machines " + swap[0] + " and " + swap[1]);	        					
-        	        			
         	        		}
         	        	}
         	        }
@@ -211,17 +210,27 @@ public class FxApp extends Application {
     		String check = listOfUpdatedTransitions.get(i);
     		char a = check.charAt(0);
     		String queueCheck = a + Integer.toString(k);
+    		ArrayList<String> transitionsToRemove = new ArrayList<String>(); 
     		
     		if(!queues.get(queueCheck).isEmpty()) {
-    			if(queues.get(queueCheck).getFirst().contains("!")) {
+        		String firstQueue = queues.get(queueCheck).getFirst();
     				//Remove transitions that contain a "!"
     				for(String list : listOfUpdatedTransitions) {
-    					if(list.contains("!")) {
-    						listOfUpdatedTransitions.remove(list);
+    					String messageCheck = firstQueue.substring(4);
+    					String messageCheck2 = list.substring(4);
+    					if(firstQueue.contains("!") && list.contains("!")) {
+    						transitionsToRemove.add(list);
     					}
+    	    			if(!messageCheck.substring(0, messageCheck.indexOf(" ")).equals(messageCheck2.substring(0, messageCheck2.indexOf(" ")))) {
+    	    				transitionsToRemove.add(list);
+    	    			}
+    	    			//Remove transitions that contain a "?"
+    					if(firstQueue.contains("?") && list.contains("?")) {
+    						transitionsToRemove.add(list);
+    					}	
     				}
-    			}  	        			
     		}
+    		listOfUpdatedTransitions.removeAll(transitionsToRemove);
     		if(listOfUpdatedTransitions.size() == 0) {
     			listOfUpdatedTransitions = listOfTransitions;
     		}
